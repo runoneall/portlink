@@ -1,9 +1,12 @@
 name: Go
 
 on:
-  push:
-    tags:
-      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: "Version"
+        required: true
+        type: string
 
 jobs:
   build:
@@ -35,7 +38,8 @@ jobs:
 
       - name: Release
         uses: softprops/action-gh-release@v2
-        if: github.ref_type == 'tag'
         with:
+          tag_name: ${{ github.event.inputs.tag_name }}
           files: |
             go-release/*
+          name: Release ${{ github.event.inputs.tag_name }}
