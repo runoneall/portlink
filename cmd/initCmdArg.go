@@ -6,6 +6,7 @@ var (
 	RemotePort    *int
 	LocalHost     *string
 	LocalPort     *int
+	DoStop        *string
 	IsList        *bool
 )
 
@@ -15,5 +16,6 @@ func initCmdArg() {
 	RemotePort = Cli.Flags().Int("rp", 0, "远程端口")
 	LocalHost = Cli.Flags().String("lh", "0.0.0.0", "本地主机")
 	LocalPort = Cli.Flags().Int("lp", 0, "本地端口")
+	DoStop = Cli.Flags().String("stop", "", "停止转发")
 	IsList = Cli.Flags().Bool("l", false, "列出转发的端口")
 }
