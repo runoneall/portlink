@@ -14,8 +14,20 @@ jobs:
       matrix:
         goos: [linux, darwin, windows, freebsd]
         goarch: [amd64, 386, arm, arm64]
+        exclude:
+          - goos: darwin
+            goarch: 386
+          - goos: darwin
+            goarch: arm
+          - goos: windows
+            goarch: arm
+          - goos: freebsd
+            goarch: arm64
 
     runs-on: ubuntu-latest
+
+    outputs:
+      release_files: ${{ steps.set_output.outputs.files }}
 
     steps:
       - name: Checkout
@@ -27,14 +39,52 @@ jobs:
           go-version: "1.25.3"
 
       - name: Make release dir
-        run: mkdir go-release
+        run: mkdir -p go-release
 
       - name: Build
-        run: go build -ldflags="-s -w" -trimpath -v -o go-release/portlink-${{ matrix.goos }}-${{ matrix.goarch }}
+        run: |
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            OUTPUT_FILE="go-release/portlink-${{ matrix.goos }}-${{ matrix.goarch }}.exe"
+          else
+            OUTPUT_FILE="go-release/portlink-${{ matrix.goos }}-${{ matrix.goarch }}"
+          fi
+          go build -ldflags="-s -w" -trimpath -v -o $OUTPUT_FILE
         env:
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
           CGO_ENABLED: 0
+
+      - name: Set output file path
+        id: set_output
+        run: |
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            FILE_PATH="go-release/portlink-${{ matrix.goos }}-${{ matrix.goarch }}.exe"
+          else
+            FILE_PATH="go-release/portlink-${{ matrix.goos }}-${{ matrix.goarch }}"
+          fi
+          echo "files=$FILE_PATH" >> $GITHUB_OUTPUT
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: portlink-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: go-release/*
+          retention-days: 1
+
+  release:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: go-release
+          merge-multiple: true
+
+      - name: List release files
+        run: ls -l go-release/
 
       - name: Release
         uses: softprops/action-gh-release@v2
