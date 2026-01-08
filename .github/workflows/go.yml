@@ -43,3 +43,4 @@ jobs:
           files: |
             go-release/*
           name: Release ${{ github.event.inputs.tag_name }}
+          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
