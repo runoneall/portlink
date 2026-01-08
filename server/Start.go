@@ -19,14 +19,14 @@ func Start() {
 
 		if err != nil {
 			if err != io.EOF {
-				fmt.Println("不能读取客户端请求", err)
+				fmt.Println("不能读取客户端请求:", err)
 			}
 			return
 		}
 
 		job, err := parseJSON(raw)
 		if err != nil {
-			fmt.Println("不能解析客户端请求", err)
+			fmt.Println("不能解析客户端请求:", err)
 			return
 		}
 

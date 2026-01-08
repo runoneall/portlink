@@ -19,7 +19,7 @@ func jobForward(conn net.Conn) {
 
 	raw, err := json.Marshal(&job)
 	if err != nil {
-		fmt.Println("不能创建请求", err)
+		fmt.Println("不能创建请求:", err)
 		return
 	}
 
@@ -28,7 +28,7 @@ func jobForward(conn net.Conn) {
 
 	resp, err := io.ReadAll(conn)
 	if err != nil {
-		fmt.Println("不能读取响应", err)
+		fmt.Println("不能读取响应:", err)
 		return
 	}
 
