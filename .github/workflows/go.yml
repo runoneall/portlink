@@ -17,12 +17,6 @@ jobs:
         exclude:
           - goos: darwin
             goarch: 386
-          - goos: darwin
-            goarch: arm
-          - goos: windows
-            goarch: arm
-          - goos: freebsd
-            goarch: arm64
 
     runs-on: ubuntu-latest
 
