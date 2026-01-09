@@ -32,11 +32,7 @@ func (f *forward) Udp() error {
 	go func() {
 		<-f.stopChan
 		localConn.Close()
-
-		connMap.Range(func(key, value interface{}) bool {
-			connMap.Delete(key)
-			return true
-		})
+		connMap.Clear()
 	}()
 
 	buf := make([]byte, 65535)
@@ -50,11 +46,11 @@ func (f *forward) Udp() error {
 			break
 		}
 
-		wg.Add(1)
-		go func(clientAddr *net.UDPAddr, data []byte) {
-			defer wg.Done()
+		wg.Go(func() {
+			clientKey := clientAddr.AddrPort()
 
-			clientKey := clientAddr.String()
+			data := make([]byte, n)
+			copy(data, buf[:n])
 
 			remoteConnIface, ok := connMap.Load(clientKey)
 			if !ok {
@@ -92,8 +88,7 @@ func (f *forward) Udp() error {
 				connMap.Delete(clientKey)
 				remoteConn.Close()
 			}
-
-		}(clientAddr, buf[:n])
+		})
 	}
 
 	wg.Wait()
