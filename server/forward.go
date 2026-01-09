@@ -81,15 +81,15 @@ func (f *forward) Start() {
 		err := f.Tcp()
 		if err != nil {
 			fmt.Println("TCP", f.ID, "错误", err)
+			fmanager().Stop(f.ID)
 		}
-		fmanager().Stop(f.ID)
 	}()
 
 	go func() {
 		err := f.Udp()
 		if err != nil {
 			fmt.Println("UDP", f.ID, "错误", err)
+			fmanager().Stop(f.ID)
 		}
-		fmanager().Stop(f.ID)
 	}()
 }
