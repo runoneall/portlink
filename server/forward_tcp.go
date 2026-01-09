@@ -26,7 +26,7 @@ func (f *forward) Tcp() error {
 			<-f.stopChan
 			listener.Close()
 
-			connMap.Range(func(key, value interface{}) bool {
+			connMap.Range(func(key, value any) bool {
 				conn := value.(net.Conn)
 				conn.Close()
 				connMap.Delete(key)
